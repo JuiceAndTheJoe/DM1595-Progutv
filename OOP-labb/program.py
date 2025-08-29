@@ -30,3 +30,14 @@ class Program:
     def get_total_obligatorisk_poang(self):
         # Returnerar den totala poängsumman för programmets obligatoriska kurser.
         return sum(kurs.get_poang() for kurs in self.obligatoriska_kurser)
+
+# Testkörning och assert-tester för Program
+if __name__ == "__main__":
+    # Skapa ett testprogram och lägg till kurser manuellt
+    p = Program("Testprogram")
+    p.obligatoriska_kurser.append(Kurs("K1", "Testkurs1", 5.0))
+    p.obligatoriska_kurser.append(Kurs("K2", "Testkurs2", 7.5))
+    # testar att hämta obligatoriska kurser och beräkna total poäng
+    assert len(p.get_obligatoriska_kurser()) == 2, "Antal kurser ska vara 2"
+    assert p.get_total_obligatorisk_poang() == 12.5, "Total poäng ska vara 12.5"
+    print("Alla Program-tester OK!")

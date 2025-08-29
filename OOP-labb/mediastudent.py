@@ -60,5 +60,6 @@ if __name__ == "__main__":
     MediaStudent.las_in_obligatoriska_kurser("ObligatoriskaMediakurser.csv")
     ms = MediaStudent()
     ms.las_in_studenter("Studieresultat.csv")
+    # Testa att hämta studenter, förväntar sig en lista av Student-objekt
     assert isinstance(ms.get_studenter()[0], Student)
     print("MediaStudent: Alla tester OK")
