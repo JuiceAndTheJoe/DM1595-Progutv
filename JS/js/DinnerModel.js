@@ -30,10 +30,6 @@ class DinnerModel {
         // a possible stepwise way to approach this:
         // 1: use "array spread syntax" to append to the dishes. 
         // 2: to pass all addToMenu tests (maybe after implementing removeFromMenu and dishOfType) use filter(CB) to remove the dish with the same type (if any) and append the dish to the filter() result
-        if (!dish) {
-            throw new Error("Cannot add undefined dish to menu");
-        }
-        
         function checkTypeCB(d) {
             // If dish.type is not defined or d.type !== dish.type, keep the dish
             return !dish.type || d.type !== dish.type;
@@ -121,14 +117,25 @@ const  DishSource={
        Week 2: to implement functionally, without any (procedural) if() statement, note that x.includes("") always returns true. So use a logical experssion that evaluates to "" if the query is absent from searchParams. Same for the type.
     */
     searchDishes(searchParams) {
-        function filterDishesCB(dish) {
-            // If no type is specified or dish.type matches searchParams.type
-            const typeMatch = !searchParams.type || dish.type === searchParams.type;
-            // If no query is specified or dish.name includes searchParams.query
-            const queryMatch = !searchParams.query || dish.name.toLowerCase().includes(searchParams.query.toLowerCase());
-            return typeMatch && queryMatch;
+        // Function to filter dishes by type
+        function filterByTypeCB(dish) {
+            // If no type is specified (searchParams.type is undefined or empty) OR
+            // dish.type matches searchParams.type, keep the dish
+            return !searchParams.type || dish.type === searchParams.type;
         }
-        return dishesConst.filter(filterDishesCB);
+        
+        // Function to filter dishes by name query
+        function filterByNameCB(dish) {
+            // If no query is specified (searchParams.query is undefined or empty) OR
+            // dish.name includes searchParams.query (case insensitive), keep the dish
+            return !searchParams.query || dish.name.toLowerCase().includes(searchParams.query.toLowerCase());
+        }
+        
+        // Start with all dishes, then filter by type, then filter by name query
+       // Each filter() creates a new array without modifying the original
+        return dishesConst
+            .filter(filterByTypeCB)    // First filter by type
+            .filter(filterByNameCB);   // Then filter the remaining dishes by name
     }, // comma after last object member (property, method) is accepted, so that members can easily be moved around
 
     /* Week 2: Utility method do compute a dish price depending on its ingredient prices and quantities.
