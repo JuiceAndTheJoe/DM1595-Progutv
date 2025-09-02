@@ -6,6 +6,7 @@ class DinnerModel {
         // note that you always need to use "this." when you refer to an object property!
         this.guests= 2;
         // TODO: set this.dishes to an empty array, (i.e. the menu is initially empty), see Arrays in course material
+        this.dishes = [];
     }
     
     /* Week 1: Set the number of guests to the given value. 
@@ -17,6 +18,10 @@ class DinnerModel {
         //          "number of guests not a positive integer"
         // 
         // this.guests= TODO ;
+        this.guests= num;
+        if (!Number.isInteger(this.guests) || this.guests < 1) {
+            throw new Error("number of guests not a positive integer");
+        }
     }
 
     /* Week 1:  add a dish to the menu. If a dish with the same type already exists, remove it first. 
@@ -25,6 +30,15 @@ class DinnerModel {
         // a possible stepwise way to approach this:
         // 1: use "array spread syntax" to append to the dishes. 
         // 2: to pass all addToMenu tests (maybe after implementing removeFromMenu and dishOfType) use filter(CB) to remove the dish with the same type (if any) and append the dish to the filter() result
+        if (!dish) {
+            throw new Error("Cannot add undefined dish to menu");
+        }
+        
+        function checkTypeCB(d) {
+            // If dish.type is not defined or d.type !== dish.type, keep the dish
+            return !dish.type || d.type !== dish.type;
+        }
+        this.dishes = [...this.dishes.filter(checkTypeCB), dish];
     }
     
     /* Remove dish from the menu. Identify the dish by its id. The parameter is an object which has an id property.
@@ -32,23 +46,35 @@ class DinnerModel {
        See array.filter(CB) in course material
      */
     removeFromMenu(dish) {
-        //TODO 
+        function filterIdCB(d) {
+            // If ids don't match, keep the dish
+            return d.id !== dish.id;
+        }
+        this.dishes = this.dishes.filter(filterIdCB);
     }
 
     /* Week 1: Return the dish of the given type from the menu, or undefined if no dish of the indicated type is in the menu */
     getDishOfType(type){
-        //TODO 
+        function findTypeCB(dish){
+            // If dish.type matches the look-up term type, return the dish
+            return dish.type === type;
+        }
+        return this.dishes.find(findTypeCB);
     }
 
     /* Return the menu for code outside the class/object that may need it */
     getMenu(){
-        // TODO
+        return [...this.dishes]; // return a copy of the dishes array
     }
     
     /* Week 2: Total price for the dinner given the number of guests 
      */
     getDinnerPrice(){
-        //TODO 
+        function sumDishPriceCB(total, dish) {
+            // Sum the price of each dish
+            return total + DishSource.getDishPrice(dish);
+        }
+        return this.dishes.reduce(sumDishPriceCB, 0) * this.guests;
     }
     
     /* Week 1 Bonus: Return an array of ingredients for the DinnerModel dishes, with each ingredient showing up maximum once, and the quantities added up. 
@@ -72,7 +98,10 @@ class DinnerModel {
 const  DishSource={
     /* Week 1: Returns a dish of specific ID, filter(CB) exercise */
     getDishDetails(id) {
-        //TODO 
+        function findDishCB(dish) {
+            return dish.id === id;
+        }
+        return dishesConst.find(findDishCB);
     },
 
     /* 
@@ -92,14 +121,24 @@ const  DishSource={
        Week 2: to implement functionally, without any (procedural) if() statement, note that x.includes("") always returns true. So use a logical experssion that evaluates to "" if the query is absent from searchParams. Same for the type.
     */
     searchDishes(searchParams) {
-        //TODO 
+        function filterDishesCB(dish) {
+            // If no type is specified or dish.type matches searchParams.type
+            const typeMatch = !searchParams.type || dish.type === searchParams.type;
+            // If no query is specified or dish.name includes searchParams.query
+            const queryMatch = !searchParams.query || dish.name.toLowerCase().includes(searchParams.query.toLowerCase());
+            return typeMatch && queryMatch;
+        }
+        return dishesConst.filter(filterDishesCB);
     }, // comma after last object member (property, method) is accepted, so that members can easily be moved around
 
     /* Week 2: Utility method do compute a dish price depending on its ingredient prices and quantities.
       see reduce(CB, acc) in course material
     */
     getDishPrice(dish){
-        //TODO 
+        function sumIngredientPriceCB(total, ingredient) {
+            return total + ingredient.price * ingredient.quantity;
+        }
+        return dish.ingredients.reduce(sumIngredientPriceCB, 0);
     },
 
 };  /* good to have a semicolon after a let or const declaration */
