@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DinnerModel tests</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.css"/>
+</head>
+<body>
+<div class="container">
+    <div id="mocha"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.3.7/chai.js"></script>
+
+<script class="mocha-init">
+  mocha.setup({
+    ui: 'bdd'
+  });
+  mocha.checkLeaks();
+  const testURL= mocha._reporter.prototype.testURL;
+  mocha._reporter.prototype.testURL= function(test){
+      // we hijack the testURL method to modify the test stacktrace in case of error
+      if(test.err){
+          console.error(test.err.stack);
+          test.err.originalStack=test.err.stack;
+          test.err.stack="\nCheck errors at the top of Console! Click on line numbers to see the code that provoked this error.";
+     }
+      return testURL(test);
+  }
+
+</script>
+
+<!-- The application JavaScript code -->
+<script src="js/dishesConst.js"></script>
+<script src="js/DinnerModel.js"></script>
+<script src="test/dinnerModel.test.js"></script>
+
+<script class="mocha-exec">
+  mocha.run();
+</script>
+
+</body>
+</html>
