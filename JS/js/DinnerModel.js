@@ -83,23 +83,34 @@ class DinnerModel {
        Week 2 Bonus: implement functionally, with no assignments, using a method chain and and object cloning 
     */
     getIngredients(){
-        return this.dishes
-            .flatMap(dish => dish.ingredients) // get all ingredients of all dishes into a single array
-            .reduce((acc, ingredient) => {
-                // If the ingredient name exists in accumulator, add quantity to existing ingredient
-                // Otherwise, add the ingredient as a new entry
-                const existingIngredient = acc.find(i => i.name === ingredient.name);
-                if (existingIngredient) {
-                    // Create a new array with all ingredients except the one with matching name
-                    return [
-                        ...acc.filter(i => i.name !== ingredient.name),
-                        { ...existingIngredient, quantity: existingIngredient.quantity + ingredient.quantity }
-                    ];
-                } else {
-                    // Add a clone of the ingredient to the array
-                    return [...acc, { ...ingredient }];
-                }
-            }, []);
+        // Define callback functions for our chain
+        function flattenIngredientsCB(dish) {
+            // Extract ingredients from each dish
+            return dish.ingredients;
+        }
+        
+        // The first reduce groups ingredients by name in an object
+        function groupByNameReducerCB(acc, ingredient) {
+            const key = ingredient.name;
+            return {
+                ...acc,
+                [key]: acc[key] 
+                    ? { ...ingredient, quantity: acc[key].quantity + ingredient.quantity } 
+                    : { ...ingredient }
+            };
+        }
+        
+        // The second reduce transforms the object entries into an array
+        function entriesToArrayReducerCB(result, [_, value]) {
+            return [...result, value];
+        }
+        
+        // Create a purely functional chain with two reduce operations
+        return Object.entries(
+            this.dishes
+                .flatMap(flattenIngredientsCB)
+                .reduce(groupByNameReducerCB, {})
+        ).reduce(entriesToArrayReducerCB, []);
     }
 }
 
