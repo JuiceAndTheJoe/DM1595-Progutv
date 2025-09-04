@@ -91,11 +91,10 @@ class DinnerModel {
         
         // The first reduce groups ingredients by name in an object
         function groupByNameReducerCB(acc, ingredient) {
-            const key = ingredient.name;
             return {
                 ...acc,
-                [key]: acc[key] 
-                    ? { ...ingredient, quantity: acc[key].quantity + ingredient.quantity } 
+                [ingredient.name]: acc[ingredient.name] 
+                    ? { ...ingredient, quantity: acc[ingredient.name].quantity + ingredient.quantity } 
                     : { ...ingredient }
             };
         }
