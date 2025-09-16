@@ -68,7 +68,8 @@ class DinnerModel {
     /* Week 2: Total price for the dinner given the number of guests 
      */
     getDinnerPrice(){
-        function sumDishPriceCB(total, dish) {
+        function sumDishPriceCB(
+            total, dish) {
             // Sum the price of each dish
             return total + DishSource.getDishPrice(dish);
         }
@@ -92,6 +93,7 @@ class DinnerModel {
         }
         
         // The first reduce groups ingredients by name in an object
+        // creates an object where key: ingredient name, value: ingredient object with summed quantity
         function groupByNameReducerCB(acc, ingredient) {
             return {
                 ...acc,
@@ -109,9 +111,9 @@ class DinnerModel {
         // Create a purely functional chain with two reduce operations
         return Object.entries(
             this.dishes
-                .flatMap(flattenIngredientsCB)
-                .reduce(groupByNameReducerCB, {})
-        ).reduce(entriesToArrayReducerCB, []);
+                .flatMap(flattenIngredientsCB) // extract all ingredients from all dishes
+                .reduce(groupByNameReducerCB, {}) // group by ingredient name and sum quantities
+        ).reduce(entriesToArrayReducerCB, []); // convert the grouped object back into an array
     }
 }
 
