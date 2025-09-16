@@ -18,9 +18,11 @@ class DinnerModel {
         //          "number of guests not a positive integer"
         // 
         // this.guests= TODO ;
-        this.guests= num;
-        if (!Number.isInteger(this.guests) || this.guests < 1) {
+        if (!Number.isInteger(num) || num < 1) {
             throw new Error("number of guests not a positive integer");
+        }
+        else {
+            this.guests = num;
         }
     }
 
