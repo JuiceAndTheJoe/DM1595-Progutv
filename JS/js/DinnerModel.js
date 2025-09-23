@@ -92,13 +92,15 @@ class DinnerModel {
             return dish.ingredients;
         }
         
-        // The first reduce groups ingredients by name in an object
-        // creates an object where key: ingredient name, value: ingredient object with summed quantity
+        // The first reduce groups ingredients by name in a dictionary object
+        // where key: ingredient name, value: ingredient object with summed quantity
         function groupByNameReducerCB(acc, ingredient) {
             return {
-                ...acc,
-                [ingredient.name]: acc[ingredient.name] 
+                ...acc, // spread the existing accumulated object
+                [ingredient.name]: acc[ingredient.name] // if current ingredient already exists, 
+                    // sum quantities
                     ? { ...ingredient, quantity: acc[ingredient.name].quantity + ingredient.quantity } 
+                    // else, just add the ingredient as a new entry
                     : { ...ingredient }
             };
         }
@@ -108,12 +110,12 @@ class DinnerModel {
             return [...result, value];
         }
         
-        // Create a purely functional chain with two reduce operations
+        // Functional chain with two reduce operations
         return Object.entries(
             this.dishes
                 .flatMap(flattenIngredientsCB) // extract all ingredients from all dishes
                 .reduce(groupByNameReducerCB, {}) // group by ingredient name and sum quantities
-        ).reduce(entriesToArrayReducerCB, []); // convert the grouped object back into an array
+        ).reduce(entriesToArrayReducerCB, []); // convert the grouped object back into an array of arrays, [ingredientName, ingredientObject] in each.
     }
 }
 
