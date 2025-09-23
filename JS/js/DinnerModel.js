@@ -110,6 +110,10 @@ class DinnerModel {
             return [...result, value];
         }
         
+        console.log(this.dishes.flatMap(flattenIngredientsCB));
+        console.log("-----");
+        console.log(this.dishes.map(flattenIngredientsCB));
+
         // Functional chain with two reduce operations
         return Object.entries(
             this.dishes
