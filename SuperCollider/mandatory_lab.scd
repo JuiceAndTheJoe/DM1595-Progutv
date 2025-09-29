@@ -75,6 +75,38 @@ a = Synth (\test)
 
 //Write your Synth here now:
 
+(
+// Klank-based PinkNoise resonator Synth
+SynthDef(\klankHarmonics, {
+    arg freq = 220, amp = 0.5, decay = 2.5;
+    var freqs, amps, rings, sig;
+
+    // Create an array of 10 harmonic partials with random detuning +-10%
+    freqs = Array.fill(10, { |i|
+        freq * (i+1) * rrand(0.9, 1.1)  // harmonic number * detune factor
+    });
+
+    // Amplituds decreasing with harmonic index, as in Task 1
+    amps = Array.fill(10, { |i|
+        amp / (i+1)    // softer as harmonics go up
+    });
+
+    // Ring times (decay of resonances) are all equal
+    rings = Array.fill(10, { decay });
+
+    // Input excitation: pink noise
+    sig = PinkNoise.ar(0.3);
+
+    // Resonator bank
+    sig = Klank.ar(`[freqs, amps, rings], sig);
+
+    // Stereo out
+    Out.ar(0, sig!2);
+}).add;
+)
+
+// Calling the synth:
+y = Synth(\klankHarmonics);
 
 
 
@@ -86,6 +118,61 @@ a = Synth (\test)
 
 // The previous two synths with envelopes
 
+(
+// Additive synthesis with odd harmonics + envelope
+SynthDef(\oddHarmonicsEnv, {
+    arg freq = 100, amp = 0.5;
+    var harmonics, sig, env;
+
+    harmonics = [
+        Saw.ar(freq * 1, amp/1),
+        Saw.ar(freq * 3, amp/3),
+        Saw.ar(freq * 5, amp/5),
+        Saw.ar(freq * 7, amp/7),
+        Saw.ar(freq * 9, amp/9)
+    ];
+
+    sig = Mix(harmonics);
+
+    // Perc envelope: attack = 0.01s, release = 0.5s
+    env = EnvGen.kr(Env.perc(0.01, 0.5), doneAction:2);
+
+    Out.ar(0, (sig * env)!2);
+}).add;
+)
+
+// Calling the Synth gives us a short, 8-bit type of tone:
+x = Synth(\oddHarmonicsEnv);
+
+(
+// Klank resonator with triangle envelope
+SynthDef(\klankHarmonicsEnv, {
+    arg freq = 200, amp = 0.2, decay = 2.0;
+    var freqs, amps, rings, sig, env;
+
+    freqs = Array.fill(10, { |i|
+        freq * (i+1) * rrand(0.9, 1.1)
+    });
+
+    amps = Array.fill(10, { |i|
+        amp / (i+1)
+    });
+
+    rings = Array.fill(10, { decay });
+
+    sig = PinkNoise.ar(0.3);
+
+    sig = Klank.ar(`[freqs, amps, rings], sig);
+
+    // Triangle envelope: 5s duration, scaled to 0.7
+    env = EnvGen.kr(Env.triangle(5), doneAction:2);
+
+    Out.ar(0, (sig * env * 0.7)!2);
+}).add;
+)
+
+// We now get a segment of the sound, with the 'volume' of it being triangular:
+y = Synth(\klankHarmonicsEnv);
 
 
 
@@ -95,16 +182,39 @@ a = Synth (\test)
 ///                      ///
 ////////////////////////////
 
-// Granulation:
+// Granulation using additive sawtooth odd harmonics as input:
 
 (
 SynthDef(\grain, {
-	arg ...
+    arg amp = 0.5;
+    var sound, harmonics, sig, trig, gDur, grain;
 
-	var
-	sound = // ... //
-	grain = GrainIn.ar(2, ...), //Pay attention here: thanks to that "2" the granulator will produce a stereo sound. If you want a mono sound, then write 1 instead.
+    // ----- Task 1 additive synthesis (odd harmonics, no env) -----
+    harmonics = [
+        Saw.ar(440 * 1, amp/1),
+        Saw.ar(440 * 3, amp/3),
+        Saw.ar(440 * 5, amp/5),
+        Saw.ar(440 * 7, amp/7),
+        Saw.ar(440 * 9, amp/9)
+    ];
+    sound = Mix(harmonics);
 
-	Out.ar(0, grain);
-}).add
+    // ----- Mouse control -----
+    trig = Impulse.ar(MouseX.kr(10, 100));     // grain trigger rate: 10–100 Hz
+    gDur = MouseY.kr(0.001, 0.01);             // grain size: 1–10 ms
+
+    // ----- Granulator -----
+    grain = GrainIn.ar(
+        2,           // 2 channels
+        trig,        // trigger signal
+        gDur,        // grain duration
+        sound        // input signal
+    );
+
+    Out.ar(0, grain);
+}).add;
 )
+
+// Run it:
+x = Synth(\grain);
+FreqScope.new
