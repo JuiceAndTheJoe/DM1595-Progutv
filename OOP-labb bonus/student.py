@@ -1,5 +1,4 @@
 class Student:
-    # En godtycklig student ska ha namn och en lista av avklarade kurser
     # Konstruktor för Student
     def __init__(self, namn, avklarade_kurser):
         self._namn = namn

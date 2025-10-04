@@ -1,11 +1,7 @@
-"""
-Denna fil används inte i bonuslabbet, funktionalitet flyttad till ProgramStudent.
-"""
 from kurs import Kurs
 from student import Student
 
 class MediaStudent:
-    # En mediestudent ska ha namn och en lista av avklarade kurser inom sitt program
     # Lista och dictionary för hantering av obligatoriska kurser i medieprogrammet
     _obligatoriska_kurser = [] # innehåller alla obligatoriska kurser
     _obligatoriska_kurser_dict = {} # mappar kurskod till Kurs-objekt
@@ -63,6 +59,5 @@ if __name__ == "__main__":
     MediaStudent.las_in_obligatoriska_kurser("ObligatoriskaMediakurser.csv")
     ms = MediaStudent()
     ms.las_in_studenter("Studieresultat.csv")
-    # Testa att hämta studenter, förväntar sig en lista av Student-objekt
     assert isinstance(ms.get_studenter()[0], Student)
     print("MediaStudent: Alla tester OK")
