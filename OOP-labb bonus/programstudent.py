@@ -21,7 +21,7 @@ class Programstudent:
                 delar = rad.strip().split(";")
                 namn = delar[0]  # Första elementet är namnet
                 avklarade = delar[1:]  # Alla element efter första är kurser
-                student = Student(namn, avklarade)
+                student = Student(namn, avklarade) # Skapa studentobjekt med denna info
                 self._studenter.append(student)
     
     def get_studenter(self):
@@ -43,7 +43,30 @@ class Programstudent:
         return 100 * avklarade_poang / total if total > 0 else 0.0
 
 if __name__ == "__main__":
-    # Testkod
-    program = Program("Test")
-    ps = Programstudent(program)
-    print("Programstudent: Grundläggande funktionalitet OK")
+    import os
+
+    # Få sökvägen till mappen där detta script ligger
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Skapa absoluta sökvägar till CSV-filerna
+    media_kurser_fil = os.path.join(script_dir, "ObligatoriskaMediaKurser.csv")
+    studieresultat_fil = os.path.join(script_dir, "Studieresultat.csv")
+    
+    try:
+        # Testar att skapa Media-program och programstudenter
+        media_program = Program("Media")
+        media_program.las_in_obligatoriska_kurser(media_kurser_fil)
+        
+        media_studenter = Programstudent(media_program)
+        media_studenter.las_in_studenter(studieresultat_fil)
+        
+        # Testa beräkning av andel avklarade för varje student
+        for student in media_studenter.get_studenter():
+            andel = media_studenter.berakna_andel_avklarade(student)
+            print(f"  {student.get_namn()}: {andel:.1f}%")
+        print("Allt funkar!")        
+    except FileNotFoundError as e:
+        print(f"Kunde inte hitta en CSV-fil: {e}")
+    except Exception as e:
+        print(f"Ett oväntat fel inträffade: {e}")
+
