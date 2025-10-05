@@ -11,9 +11,6 @@ class Programstudent:
         self._program = program
         self._studenter = []
     
-    def get_program(self):
-        return self._program
-    
     def las_in_studenter(self, filnamn):
         """Läser in studenter från CSV-fil"""
         with open(filnamn, encoding="utf-8") as f:

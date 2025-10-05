@@ -23,6 +23,10 @@ class Program:
                 self._obligatoriska_kurser.append(kurs)
                 self._obligatoriska_kurser_dict[kod] = kurs
     
+    def get_obligatoriska_kurser_dict(self):
+        """Returnerar dictionary med obligatoriska kurser för snabb uppslagning"""
+        return self._obligatoriska_kurser_dict
+    
     def get_total_obligatorisk_poang(self):
         """Beräknar total poäng för alla obligatoriska kurser"""
         return sum(kurs.get_poang() for kurs in self._obligatoriska_kurser)
